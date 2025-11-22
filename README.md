@@ -9,7 +9,7 @@ PHP 版本：	  PHP 7.4+（需开启 PDO、MBstring、JSON、GD 扩展）
 数据库：	    MySQL 5.7+/MariaDB 10.2+  
 # 系统部署指南：  
 ## 上传系统源码
-   CMS 系统源码包解压后，通过 FTP 工具或服务器文件管理工具，上传至 Web 服务器的网站根目录
+   CMS 系统源码包解压后，通过 FTP 工具或服务器文件管理工具，上传至 Web 服务器的网站根目录。composer creat-project topthink/think tp6创建一个tp6项目，用仓库中提供的代码文件替换原项目中的文件。
 ## 配置数据库
 登录 MySQL 数据库管理工具（如 Navicat、PhpMyAdmin），创建新数据库（建议编码格式为 UTF-8）；导入系统提供的数据库脚本（tp6_cms.sql），完成数据表初始化；编辑系统配置文件 config/database.php，修改数据库连接信息。
 ## 权限配置
