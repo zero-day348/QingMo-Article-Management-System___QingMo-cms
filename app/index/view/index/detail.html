@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$site_title}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/index/css/style.css" rel="stylesheet">
+    <style>
+        /* 导航栏增强 */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            margin: 0 5px;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #fff;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 文章标题美化 */
+        .article-title {
+            font-weight: 700;
+            color: #2c3e50;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        /* 文章信息区样式 */
+        .article-meta {
+            background-color: #f8f9fa;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #0d6efd;
+            margin-bottom: 2rem;
+        }
+        .article-meta a {
+            transition: color 0.3s ease;
+        }
+        .article-meta a:hover {
+            color: #0a58ca;
+            text-decoration: underline;
+        }
+
+        /* 文章正文美化 */
+        .article-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #343a40;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .article-content p {
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1.5rem auto;
+            display: block;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 上下篇按钮美化 */
+        .btn {
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-primary:hover {
+            background-color: #0a58ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        /* 页脚增强 */
+        footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background-color: #212529;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        footer p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* 页面加载动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .container.my-5 {
+            animation: fadeIn 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">轻墨CMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index/index/article">所有文章</a>
+                    </li>
+                    {foreach $categories as $cate}
+                    <li class="nav-item">
+                        <a class="nav-link {eq name='cate.id' value='$article.cid'}active{/eq}" href="/index/index/category?id={$cate.id}">{$cate.name}</a>
+                    </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 文章详情区 -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- 文章标题 -->
+                <h1 class="text-center article-title">{$article.title}</h1>
+
+                <!-- 文章信息 -->
+                <div class="text-center article-meta">
+                    <span>发布时间：{$article.create_time|date='Y-m-d H:i'}</span> | 
+                    <span>所属分类：<a href="/index/index/category?id={$category.id}" class="text-primary">{$category.name}</a></span>
+                </div>
+
+                <!-- 文章正文 -->
+                <div class="article-content mb-5">
+                    {$article.content|raw} <!-- raw过滤：保留HTML格式 -->
+                </div>
+
+                <!-- 上下篇 -->
+                <div class="d-flex justify-content-between mb-5 gap-3 flex-wrap">
+                    {if $prevArticle}
+                    <a href="/index/index/detail?id={$prevArticle.id}" class="btn btn-outline-primary">上一篇：{$prevArticle.title}</a>
+                    {else}
+                    <button class="btn btn-outline-primary" disabled>没有上一篇</button>
+                    {/if}
+                    
+                    {if $nextArticle}
+                    <a href="/index/index/detail?id={$nextArticle.id}" class="btn btn-outline-primary">下一篇：{$nextArticle.title}</a>
+                    {else}
+                    <button class="btn btn-outline-primary" disabled>没有下一篇</button>
+                    {/if}
+                </div>
+
+                <!-- 回到列表 -->
+                <div class="text-center">
+                    <a href="/index/index/category?id={$category.id}" class="btn btn-primary">返回分类列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">© 2025 轻墨CMS站点 - 保留所有权利</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/index/js/common.js"></script>
+</body>
+</html>

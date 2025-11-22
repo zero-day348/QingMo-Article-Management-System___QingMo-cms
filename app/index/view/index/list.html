@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$site_title}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/index/css/style.css" rel="stylesheet">
+    <style>
+        /* 自定义样式增强 */
+        .navbar-nav .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #fff;
+            transition: width 0.3s ease;
+        }
+        .navbar-nav .nav-link:hover::after,
+        .navbar-nav .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .page-title {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 2rem;
+        }
+        
+        .article-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+        
+        .article-meta {
+            font-size: 0.9rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .article-meta i {
+            margin-right: 0.3rem;
+        }
+        
+        .article-summary {
+            color: #666;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .pagination .page-link {
+            color: #0d6efd;
+            margin: 0 0.25rem;
+            transition: all 0.2s ease;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            box-shadow: 0 2px 5px rgba(13,110,253,0.3);
+        }
+        .pagination .page-link:hover:not(.active) {
+            background-color: #f1f5f9;
+            transform: scale(1.05);
+        }
+        
+        footer {
+            background-color: #1a1a1a;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-blog me-2"></i>轻墨CMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i>首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/index/index/article"><i class="fas fa-list me-1"></i>所有文章</a>
+                    </li>
+                    {foreach $categories as $cate}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index/index/category?id={$cate.id}">{$cate.name}</a>
+                    </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面标题 -->
+    <div class="container page-title">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="mb-0">
+                <i class="fas fa-newspaper me-2 text-primary"></i>所有文章
+            </h1>
+            <span class="badge bg-primary fs-6">共 {$articles->total()} 篇</span>
+        </div>
+    </div>
+
+    <!-- 文章列表区 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                {foreach $articles as $article}
+                <div class="card article-card mb-4">
+                    <div class="card-body p-5">
+                        <h3 class="card-title mb-3">
+                            <a href="/index/index/detail?id={$article.id}" class="text-decoration-none text-dark hover:text-primary transition-colors">
+                                {$article.title}
+                            </a>
+                        </h3>
+                        <div class="card-subtitle mb-2 text-muted article-meta">
+                            <span>
+                                <i class="far fa-calendar"></i>
+                                {$article.create_time|date='Y-m-d H:i'}
+                            </span>
+                            <span>
+                                <i class="fas fa-folder"></i>
+                                <a href="/index/index/category?id={$cate.id}" class="text-primary hover:underline">
+                                    {$article.category.name|default='未分类'}
+                                </a>
+                            </span>
+                        </div>
+                        <p class="card-text article-summary">
+                            {$article.summary|default='暂无摘要'}
+                        </p>
+                        <a href="/index/index/detail?id={$article.id}" class="btn btn-sm btn-primary">
+                            阅读全文 <i class="fas fa-angle-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                {/foreach}
+
+                <!-- 分页 -->
+                {if $articles->total() > 0}
+                <div class="pagination justify-content-center mt-5">
+                    {$articles->render()}
+                </div>
+                {else}
+                <div class="text-center py-5 bg-light rounded">
+                    <i class="fas fa-file-alt text-muted fs-3 mb-2"></i>
+                    <p class="text-muted">暂无文章数据</p>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container text-center">
+            <p class="mb-2">
+                <a href="/" class="text-white text-decoration-none me-3"><i class="fas fa-home"></i> 首页</a>
+                <a href="/index/index/article" class="text-white text-decoration-none"><i class="fas fa-list"></i> 所有文章</a>
+            </p>
+            <p class="mb-0 text-secondary">© 2025 轻墨CMS站点 - 保留所有权利</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/index/js/common.js"></script>
+</body>
+</html>

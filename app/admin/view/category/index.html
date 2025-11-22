@@ -1,0 +1,90 @@
+{extend name="layout"}
+
+{block name="content"}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">分类管理</h5>
+        <a href="/admin/category/add" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle"></i> 添加分类
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- 分类列表 -->
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th width="5%">ID</th>
+                        <th width="20%">分类名称</th>
+                        <th width="10%">父分类</th>
+                        <th width="10%">排序</th>
+                        <th width="10%">状态</th>
+                        <th width="20%">创建时间</th>
+                        <th width="25%">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $list as $category}
+                    <tr>
+                        <td>{$category.id}</td>
+                        <td>{$category.name}</td>
+                        <td>
+                            {eq name="category.pid" value="0"}
+                            <span class="badge bg-secondary">顶级分类</span>
+                            {else}
+                            {foreach $list as $p}
+                            {eq name="p.id" value="$category.pid"}{$p.name}{/eq}
+                            {/foreach}
+                            {/eq}
+                        </td>
+                        <td>{$category.sort}</td>
+                        <td>
+                            {eq name="category.status" value="1"}
+                            <span class="badge bg-success">显示</span>
+                            {else}
+                            <span class="badge bg-secondary">隐藏</span>
+                            {/eq}
+                        </td>
+                        <td>{$category.create_time}</td>
+                        <td>
+                            <a href="/admin/category/edit?id={$category.id}" class="btn btn-sm btn-outline-primary">编辑</a>
+                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="{$category.id}">删除</button>
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+$(function() {
+    // 删除分类
+    $('.delete-btn').click(function() {
+        let id = $(this).data('id');
+        if (confirm('确定要删除这个分类吗？删除前请确保无关联文章和子分类！')) {
+            $.ajax({
+                url: '/admin/category/delete?id=' + id, // 关键修改：带?id参数
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    alert(res.msg);
+                    if (res.code == 1) {
+                        window.location.reload();
+                    }
+                },
+                // 新增：错误回调（排查请求失败原因）
+                error: function(xhr, status, error) {
+                    alert('请求失败：' + status + '，错误：' + error);
+                    console.log('请求URL：', '/admin/category/delete?id=' + id);
+                    console.log('响应内容：', xhr.responseText);
+                }
+            });
+        }
+    });
+});
+</script>
+{/block}

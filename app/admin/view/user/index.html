@@ -1,0 +1,84 @@
+{extend name="layout"}
+
+{block name="content"}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">用户管理</h5>
+        <a href="/admin/user/add" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle"></i> 添加用户
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- 用户列表 -->
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th width="5%">ID</th>
+                        <th width="15%">用户名</th>
+                        <th width="15%">昵称</th>
+                        <th width="10%">状态</th>
+                        <th width="20%">创建时间</th>
+                        <th width="35%">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $list as $user}
+                    <tr>
+                        <td>{$user.id}</td>
+                        <td>{$user.username}</td>
+                        <td>{$user.nickname}</td>
+                        <td>
+                            {eq name="user.status" value="1"}
+                            <span class="badge bg-success">正常</span>
+                            {else}
+                            <span class="badge bg-danger">禁用</span>
+                            {/eq}
+                        </td>
+                        <td>{$user.create_time}</td>
+                        <td>
+                            <!-- 原链接：/admin/user/edit/{$user.id} -->
+                            <a href="/admin/user/edit?id={$user.id}" class="btn btn-sm btn-outline-primary">编辑</a>
+                            {neq name="user.id" value="1"}
+                            <button class="btn btn-sm btn-outline-danger delete-btn" data-id="{$user.id}">删除</button>
+                            {else}
+                            <button class="btn btn-sm btn-outline-danger" disabled>超级管理员不可删除</button>
+                            {/neq}
+                        </td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        <div class="mt-3">
+            {$list->render()}
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+$(function() {
+    // 删除用户
+    $('.delete-btn').click(function() {
+        let id = $(this).data('id');
+        if (confirm('确定要删除这个用户吗？删除后不可恢复！')) {
+            $.ajax({
+                url: '/admin/user/delete?id=' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    alert(res.msg);
+                    if (res.code == 1) {
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+    });
+});
+</script>
+{/block}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索结果：{$keyword} - 轻墨CMS站点</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/index/css/style.css" rel="stylesheet">
+    <!-- 引入Font Awesome图标 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏（语法完全正确） -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <!-- 品牌Logo -->
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-blog me-2"></i>轻墨CMS
+        </a>
+        
+        <!-- 移动端折叠按钮 -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="切换导航">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- 导航核心内容（折叠区域） -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <!-- 左侧导航菜单 -->
+            <ul class="navbar-nav me-auto">
+                <!-- 首页激活状态：当前控制器是Index且方法是index -->
+                <li class="nav-item">
+                    <a class="nav-link {if $Think.controller == 'Index' && $Think.action == 'index'}active{/if}" href="/">
+                        <i class="fas fa-home me-1"></i>首页
+                    </a>
+                </li>
+                <!-- 所有文章激活状态：当前控制器是Index且方法是article -->
+                <li class="nav-item">
+                    <a class="nav-link {if $Think.controller == 'Index' && $Think.action == 'article'}active{/if}" href="/index/index/article">
+                        <i class="fas fa-newspaper me-1"></i>所有文章
+                    </a>
+                </li>
+                <!-- 分类导航 -->
+                {foreach $categories as $cate}
+                <li class="nav-item">
+                    <a class="nav-link {if $Think.action == 'category' && $Think.get.id == $cate.id}active{/if}" href="/index/index/category?id={$cate.id}">
+                        <i class="fas fa-folder me-1"></i>{$cate.name}
+                    </a>
+                </li>
+                {/foreach}
+            </ul>
+            
+            <!-- 右侧：搜索框 + 登录状态 -->
+            <div class="d-flex align-items-center">
+                <!-- 搜索框（无冲突语法） -->
+                <form class="d-flex me-3" action="/index/index/search" method="get" role="search">
+                    <input class="form-control form-control-sm me-2" type="search" name="keyword" 
+                           placeholder="搜索文章..." required 
+                           value="{$keyword ?? $Think.get.keyword ?? ''}">
+                    <button class="btn btn-light btn-sm" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <!-- 登录状态菜单（ThinkTemplate原生语法） -->
+                <ul class="navbar-nav">
+                    {if $Think.session.front_user}
+                        <!-- 已登录状态 -->
+                        {if $Think.session.front_user.role == 1}
+                        <!-- 管理员 -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/login">
+                                <i class="fas fa-tachometer-alt me-1"></i>进入后台
+                            </a>
+                        </li>
+                        {/if}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/index/article/publish">
+                                <i class="fas fa-pen me-1"></i>发布文章
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/index/user/logout">
+                                <i class="fas fa-sign-out-alt me-1"></i>退出
+                            </a>
+                        </li>
+                    {else}
+                        <!-- 未登录状态 -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="/index/user/login">
+                                <i class="fas fa-sign-in-alt me-1"></i>前台登录
+                            </a>
+                        </li>
+                    {/if}
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <!-- 核心内容区（整合高亮语法） -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="alert alert-info mb-4">
+                    搜索关键词：<strong>{$keyword}</strong>，共找到 <strong>{$total}</strong> 篇相关文章
+                </div>
+
+                {if $total > 0}
+                    <div class="list-group">
+                    {foreach $articles as $article}
+                    <a href="/index/index/detail?id={$article.id}" class="list-group-item list-group-item-action">
+                        <h5 class="mb-1">{$article.title}</h5>
+                        <small>发布时间: {$article.create_time|date='Y-m-d H:i'}</small>
+                        <br>
+                        <small>分类: {$article.category.name|default='未分类'}</small>
+                    </a>
+                    {/foreach}
+                </div>
+                <div class="mt-4">{$articles|raw}</div>
+                {else}
+                <div class="alert alert-warning text-center py-5">
+                    <h4 class="mb-3">未找到相关文章</h4>
+                    <p>建议：</p>
+                    <ul class="text-left d-inline-block">
+                        <li>检查关键词是否正确</li>
+                        <li>尝试使用更宽泛的关键词</li>
+                        <li>查看<a href="/index/index/article" class="text-primary">所有文章</a></li>
+                    </ul>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">© 2025 轻墨CMS站点 - 保留所有权利</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/index/js/common.js"></script>
+</body>
+</html>

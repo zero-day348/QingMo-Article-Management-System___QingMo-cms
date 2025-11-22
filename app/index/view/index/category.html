@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$site_title}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/index/css/style.css" rel="stylesheet">
+    <style>
+        /* 统一风格增强 */
+        .navbar {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .nav-link {
+            transition: all 0.2s ease;
+            position: relative;
+            margin: 0 4px;
+        }
+        .nav-link:hover:not(.active) {
+            color: rgba(255,255,255,0.9) !important;
+            transform: translateY(-2px);
+        }
+        .nav-link.active {
+            font-weight: 500;
+            background-color: rgba(255,255,255,0.15);
+            border-radius: 4px;
+        }
+        
+        /* 面包屑样式优化 */
+        .breadcrumbs {
+            font-size: 0.9rem;
+            padding: 8px 0;
+        }
+        .breadcrumbs a {
+            transition: color 0.2s ease;
+        }
+        .breadcrumbs a:hover {
+            color: #2980b9;
+        }
+        .breadcrumbs i {
+            margin: 0 8px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        /* 文章卡片增强 */
+        .card {
+            border: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+        }
+        .card-title a {
+            transition: color 0.2s ease;
+        }
+        .card-title a:hover {
+            color: #3498db !important;
+        }
+        .card-subtitle {
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+        .card-text {
+            color: #555;
+            line-height: 1.7;
+        }
+        
+        /* 按钮样式增强 */
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        /* 分页样式优化 */
+        .pagination {
+            margin: 30px 0;
+        }
+        .pagination .page-link {
+            color: #3498db;
+            border: 1px solid #e1e7ec;
+            margin: 0 4px;
+            transition: all 0.2s ease;
+        }
+        .pagination .page-link:hover {
+            color: #2980b9;
+            background-color: #f5f9ff;
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        
+        /* 页脚增强 */
+        footer {
+            background-color: #2c3e50;
+            margin-top: 60px;
+        }
+        .footer-content {
+            padding: 40px 0 20px;
+        }
+        .footer-links {
+            margin: 15px 0;
+        }
+        .footer-links a {
+            color: rgba(255,255,255,0.7);
+            margin: 0 10px;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏（完全复用） -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-blog me-2"></i>轻墨CMS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-1"></i>首页
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index/index/article">
+                            <i class="fas fa-newspaper me-1"></i>所有文章
+                        </a>
+                    </li>
+                    {foreach $categories as $cate}
+                    <li class="nav-item">
+                        <a class="nav-link {eq name='cate.id' value='$category.id'}active{/eq}" href="/index/index/category?id={$cate.id}">
+                            <i class="fas fa-folder me-1"></i>{$cate.name}
+                        </a>
+                    </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 分类标题 -->
+    <div class="container my-4">
+        <div class="breadcrumbs">
+            <a href="/" class="text-primary">首页</a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="text-dark">{$category.name}</span>
+        </div>
+        <h1 class="mt-2 mb-4">
+            <i class="fas fa-folder-open text-primary me-2"></i>
+            {$category.name}
+            <small class="h5 text-muted ms-2">（共 {$articles->total()} 篇文章）</small>
+        </h1>
+    </div>
+
+    <!-- 文章列表区 -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                {if $articles->total() > 0}
+                    {foreach $articles as $article}
+                    <div class="card mb-4">
+                        <div class="card-body p-5">
+                            <h3 class="card-title mb-3">
+                                <a href="/index/index/detail?id={$article.id}" class="text-decoration-none text-dark">{$article.title}</a>
+                            </h3>
+                            <div class="card-subtitle mb-3 text-muted">
+                                <span class="me-3"><i class="fas fa-calendar-alt me-1"></i>发布时间：{$article.create_time|date='Y-m-d H:i'}</span>
+                                <span><i class="fas fa-folder text-primary me-1"></i>所属分类：<a href="/index/index/category?id={$cate.id}" class="text-primary">{$category.name}</a></span>
+                            </div>
+                            <p class="card-text">{$article.summary|default='暂无摘要'}</p>
+                            <a href="/index/index/detail?id={$article.id}" class="btn btn-sm btn-primary mt-2">
+                                阅读全文 <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {/foreach}
+
+                    <!-- 分页 -->
+                    <div class="pagination justify-content-center">
+                        {$articles->render()}
+                    </div>
+                {else}
+                    <div class="alert alert-info text-center p-5">
+                        <i class="fas fa-info-circle fs-3 mb-3 text-primary"></i>
+                        <p class="mb-0">该分类下暂无文章，敬请期待！</p>
+                    </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="/"><i class="fas fa-home me-1"></i>首页</a>
+                    <a href="/index/index/article"><i class="fas fa-newspaper me-1"></i>所有文章</a>
+                    <a href="#"><i class="fas fa-about me-1"></i>关于我们</a>
+                    <a href="#"><i class="fas fa-contact me-1"></i>联系我们</a>
+                </div>
+                <p class="mb-0">© 2025 轻墨CMS站点 - 保留所有权利</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/index/js/common.js"></script>
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 10) {
+                navbar.classList.add('bg-primary/95');
+                navbar.classList.add('backdrop-blur-sm');
+            } else {
+                navbar.classList.remove('bg-primary/95');
+                navbar.classList.remove('backdrop-blur-sm');
+            }
+        });
+    </script>
+</body>
+</html>

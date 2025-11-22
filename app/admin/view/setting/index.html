@@ -1,0 +1,50 @@
+{extend name="layout"}
+
+{block name="content"}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">系统设置</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.location.reload()">刷新</button>
+    </div>
+    <div class="card-body">
+        <form id="settingForm">
+            <div class="mb-3">
+                <label for="site_title" class="form-label">网站标题 <span class="text-danger">*</span></label>
+                <input type="text" name="site_title" id="site_title" class="form-control" value="{$config.site_title|default=''}" placeholder="请输入网站标题" required>
+            </div>
+            <div class="mb-3">
+                <label for="site_desc" class="form-label">网站描述</label>
+                <textarea name="site_desc" id="site_desc" class="form-control" rows="3" placeholder="请输入网站描述">{$config.site_desc|default=''}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="site_logo" class="form-label">网站Logo</label>
+                <input type="text" name="site_logo" id="site_logo" class="form-control" value="{$config.site_logo|default=''}" placeholder="请输入Logo图片URL（可选）">
+            </div>
+            <button type="submit" class="btn btn-primary">保存设置</button>
+        </form>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+$(function() {
+    // 表单提交
+    $('#settingForm').submit(function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/admin/setting/save',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(res) {
+                alert(res.msg);
+                if (res.code == 1) {
+                    window.location.reload();
+                }
+            }
+        });
+    });
+});
+</script>
+{/block}

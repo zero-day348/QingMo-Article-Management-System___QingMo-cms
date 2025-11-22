@@ -1,0 +1,64 @@
+{extend name="layout"}
+
+{block name="content"}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">编辑用户</h5>
+        <a href="/admin/user" class="btn btn-sm btn-outline-secondary">返回列表</a>
+    </div>
+    <div class="card-body">
+        <form id="userForm">
+            <input type="hidden" name="id" value="{$user.id}">
+            <div class="mb-3">
+                <label for="username" class="form-label">用户名 <span class="text-danger">*</span></label>
+                <input type="text" name="username" id="username" class="form-control" value="{$user.username}" placeholder="请输入用户名（3-30字符）" required readonly>
+                <div class="form-text">用户名不可修改</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密码</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="不输入则保持原密码（6-20字符）">
+            </div>
+            <div class="mb-3">
+                <label for="nickname" class="form-label">昵称 <span class="text-danger">*</span></label>
+                <input type="text" name="nickname" id="nickname" class="form-control" value="{$user.nickname}" placeholder="请输入昵称" required>
+            </div>
+            <div class="mb-3">
+                <label for="status" class="form-label">状态 <span class="text-danger">*</span></label>
+                <select name="status" id="status" class="form-select" required>
+                    <option value="1" {eq name="user.status" value="1"}selected{/eq}>正常</option>
+                    <option value="0" {eq name="user.status" value="0"}selected{/eq}>禁用</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">提交修改</button>
+        </form>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+$(function() {
+    // 表单提交
+    $('#userForm').submit(function(e) {
+        e.preventDefault();
+        let password = $('#password').val();
+        if (password && password.length < 6) {
+            alert('密码长度不能少于6位！');
+            return false;
+        }
+        $.ajax({
+            url: '/admin/user/edit/{$user.id}',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(res) {
+                alert(res.msg);
+                if (res.code == 1) {
+                    window.location.href = res.url;
+                }
+            }
+        });
+    });
+});
+</script>
+{/block}

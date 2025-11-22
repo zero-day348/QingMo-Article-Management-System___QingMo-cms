@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>发布文章</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/tinymce/6.7.0/tinymce.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, #0d6efd 0%, #2557a7 100%);
+        }
+        .card-header h5 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        .form-control, .form-select {
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 0.6rem 0.75rem;
+            transition: all 0.2s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+            outline: none;
+        }
+        textarea.form-control {
+            resize: vertical;
+        }
+        .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5c636a;
+            border-color: #565e64;
+            transform: translateY(-1px);
+        }
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+        #content {
+            min-height: 300px;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8"> <!-- 优化响应式宽度 -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">发布文章 - 欢迎 {$user.nickname}</h5>
+                </div>
+                <div class="card-body">
+                    <form id="publishForm">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">文章标题</label>
+                            <input type="text" class="form-control" id="title" name="title" required 
+                                   placeholder="请输入吸引人的文章标题...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cid" class="form-label">文章分类</label>
+                            <select class="form-select" id="cid" name="cid" required>
+                                {foreach $categories as $cate}
+                                <option value="{$cate.id}">{$cate.name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="summary" class="form-label">文章摘要</label>
+                            <textarea class="form-control" id="summary" name="summary" rows="3" required
+                                      placeholder="简要描述文章内容，帮助读者快速了解..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">文章内容</label>
+                            <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+                        </div>
+                        <div class="d-flex gap-3"> <!-- 使用flex布局优化按钮间距 -->
+                            <button type="button" class="btn btn-primary" onclick="doPublish()">发布文章</button>
+                            <a href="/" class="btn btn-secondary">返回首页</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 提示框容器 -->
+<div class="toast-container"></div>
+
+<script>
+    tinymce.init({
+        selector: '#content',
+        plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+        toolbar_mode: 'floating',
+        skin: 'oxide', // 使用默认皮肤保持风格统一
+        content_css: 'default',
+        min_height: 400, // 增加编辑器最小高度
+        placeholder: '请输入文章详细内容...'
+    });
+
+    function doPublish() {
+        let content = tinymce.get('content').getContent();
+        $('#content').val(content);
+        
+        // 简单验证
+        if (!$('#title').val().trim()) {
+            showToast('请输入文章标题', 'error');
+            return;
+        }
+        if (!$('#summary').val().trim()) {
+            showToast('请输入文章摘要', 'error');
+            return;
+        }
+        if (!content.trim()) {
+            showToast('请输入文章内容', 'error');
+            return;
+        }
+
+        $.ajax({
+            url: '/index/article/doPublish',
+            type: 'post',
+            data: $('#publishForm').serialize(),
+            dataType: 'json',
+            success: function (res) {
+                if (res.code == 1) {
+                    showToast(res.msg, 'success');
+                    setTimeout(() => {
+                        window.location.href = res.url;
+                    }, 1500);
+                } else {
+                    showToast(res.msg, 'error');
+                }
+            },
+            error: function() {
+                showToast('网络请求失败，请稍后重试', 'error');
+            }
+        });
+    }
+
+    // 自定义提示框代替alert
+    function showToast(message, type = 'info') {
+        const toastContainer = document.querySelector('.toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast fade show ${type === 'success' ? 'bg-success' : 'bg-danger'} text-white`;
+        toast.role = 'alert';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        toastContainer.appendChild(toast);
+        
+        // 3秒后自动关闭
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+</script>
+</body>
+</html>
