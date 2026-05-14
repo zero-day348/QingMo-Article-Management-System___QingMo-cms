@@ -71,5 +71,5 @@ config/（配置文件目录）
 <img width="415" height="221" alt="image" src="https://github.com/user-attachments/assets/323b6963-4b28-4ebb-81ba-20a077da40ca" />
 <img width="415" height="222" alt="image" src="https://github.com/user-attachments/assets/dccfe4d1-364b-4979-8ce9-fa8eb3bdc5a9" />
 
-
-
+## 已申请软著
+<img width="248" height="335" alt="软著(脱敏)" src="https://github.com/user-attachments/assets/f3322070-5b64-4987-ac39-2cf50556c116" />
